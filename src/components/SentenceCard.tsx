@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 const SentenceCard = ({ question }) => {
   const [sentenceParts, setSentenceParts] = useState([]);
@@ -6,11 +7,14 @@ const SentenceCard = ({ question }) => {
   const [availableOptions, setAvailableOptions] = useState([]);
   const [timeLeft, setTimeLeft] = useState(30); // Countdown time
 
+    const navigate = useNavigate();
+
   useEffect(() => {
     const blanks = question.question.split("_____________");
     setSentenceParts(blanks);
     setFilledWords(new Array(blanks.length - 1).fill(""));
     setAvailableOptions(question.options);
+    setTimeLeft(30); // Reset timer for each question
   }, [question]);
 
   useEffect(() => {
@@ -39,11 +43,13 @@ const SentenceCard = ({ question }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg w-full max-w-3xl mx-auto my-6">
+    <div className="bg-white rounded-2xl p-6 w-full max-w-3xl mx-auto my-6">
       {/* Top bar */}
       <div className="flex justify-between mb-4">
         <div className="text-red-500 font-semibold text-lg">Time: {timeLeft}s</div>
-        <button className="text-gray-500 hover:text-red-500">Quit</button>
+        <button 
+        onClick = {() =>navigate('/main')}
+        className="text-gray-500 hover:text-red-500">Quit</button>
       </div>
 
       {/* Sentence with blanks */}
@@ -79,6 +85,8 @@ const SentenceCard = ({ question }) => {
           </button>
         ))}
       </div>
+
+       
     </div>
   );
 };
