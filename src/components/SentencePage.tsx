@@ -54,14 +54,28 @@ const MainPage = () => {
       navigate("/result");
     }
   };
-  
+
+  // Calculate the progress as a percentage
+  const progress = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f4f8fc] p-6 shadow-lg-rounded-3xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-100 to-green-200 p-6 shadow-lg-rounded-3xl">
       <div className="bg-white p-6 rounded-xl shadow-lg">
+        {/* Progress Bar */}
+        <div className="w-full bg-gray-200 rounded-full mb-4">
+          <div
+            className="bg-blue-500 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+            style={{ width: `${progress}%` }}
+          >
+            {Math.round(progress)}%
+          </div>
+        </div>
+
         <SentenceCard
           question={questions[currentIndex]}
           onAnswer={handleNext}
+          currentIndex={currentIndex}
+          totalQuestions={questions.length}
         />
       </div>
     </div>

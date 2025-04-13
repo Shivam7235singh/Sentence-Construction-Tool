@@ -54,13 +54,13 @@ const MainPage = () => {
       {/* Buttons */}
       <section className="flex justify-center gap-8 pb-16">
         <button
-          className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white rounded-full shadow-md transition"
+          className="px-6 py-3 bg-gray-400 hover:bg-gray-600 text-white font-bold rounded-full shadow-md transition"
           onClick={() => navigate("/")}
         >
           Back
         </button>
         <button
-          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md transition"
+          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full shadow-md transition"
           onClick={() => navigate("/sentence")}
         >
           Start

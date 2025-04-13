@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuiz } from "../context/score";
 
 interface Question {
   question: string;
@@ -17,6 +18,7 @@ const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
   const [filledWords, setFilledWords] = useState<string[]>([]);
   const [availableOptions, setAvailableOptions] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(60);
+  const { score, setScore, responses, setResponses } = useQuiz();
 
   const navigate = useNavigate();
 
@@ -65,21 +67,36 @@ const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
     onAnswer(filledWords);
   };
 
+
+  const handleExit= () => {
+    setScore(0);
+    setResponses([{
+      originalQuestion: "",
+      userFilled: "",
+      correctFilled: "",
+      selected: [],
+      correct: [],
+    }]);
+    navigate("/");
+  }
+
+
   return (
-    <div className="bg-white rounded-2xl p-6 w-full max-w-3xl mx-auto my-6">
-      <div className="flex justify-between mb-4">
-        <div className="text-red-500 font-semibold text-lg">
+    <div className="bg-white rounded-2xl p-6 w-full h-[34rem] select-none relative max-w-3xl mx-auto my-6">
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-green-500 font-semibold text-xl">
           Time: {timeLeft}s
         </div>
         <button
-          onClick={() => navigate("/")}
+          onClick={handleExit}
           className="shadow-2xl bg-red-600 font-bold text-white px-6 py-2 rounded-xl"
         >
           Quit
         </button>
       </div>
+      <h1 className="text-xl text-center font-medium m-5 text-gray-500">select the missing word in correct order</h1>
 
-      <div className="text-xl font-medium mb-6 flex flex-wrap gap-2">
+      <div className="text-xl font-medium mb-6 flex flex-wrap h-64 gap-2">
         {sentenceParts.map((part, i) => (
           <span key={i}>
             {part}
@@ -111,7 +128,7 @@ const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
         ))}
       </div>
 
-      <div className="flex justify-end">
+      <div className="absolute -bottom-6 right-4">
         <button
           onClick={handleSubmit}
           disabled={filledWords.includes("")}
