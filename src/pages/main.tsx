@@ -34,7 +34,7 @@ const MainPage = () => {
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Time Per Question
           </h3>
-          <p className="text-2xl text-green-600 font-bold">60 sec</p>
+          <p className="text-2xl text-green-600 font-bold">30 sec</p>
         </div>
         <div className="bg-white rounded-2xl shadow-lg p-6 w-60 text-center">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">

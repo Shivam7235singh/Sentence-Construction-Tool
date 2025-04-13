@@ -17,7 +17,7 @@ const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
   const [sentenceParts, setSentenceParts] = useState<string[]>([]);
   const [filledWords, setFilledWords] = useState<string[]>([]);
   const [availableOptions, setAvailableOptions] = useState<string[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(60);
+  const [timeLeft, setTimeLeft] = useState<number>(30);
   const { score, setScore, responses, setResponses } = useQuiz();
 
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
     setSentenceParts(parts);
     setFilledWords(new Array(parts.length - 1).fill(""));
     setAvailableOptions(question.options);
-    setTimeLeft(60);
+    setTimeLeft(30);
   }, [question]);
 
   useEffect(() => {
