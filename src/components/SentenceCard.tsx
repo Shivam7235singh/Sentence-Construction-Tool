@@ -1,30 +1,48 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
-const SentenceCard = ({ question }) => {
-  const [sentenceParts, setSentenceParts] = useState([]);
-  const [filledWords, setFilledWords] = useState([]);
-  const [availableOptions, setAvailableOptions] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(30); // Countdown time
+interface Question {
+  question: string;
+  options: string[];
+  correctAnswer: string[]; // ✅ fixed this to match your context
+}
 
-    const navigate = useNavigate();
+interface SentenceCardProps {
+  question: Question;
+  onAnswer: (selectedAnswer: string[]) => void; // ✅ changed to string[]
+}
+
+const SentenceCard: React.FC<SentenceCardProps> = ({ question, onAnswer }) => {
+  const [sentenceParts, setSentenceParts] = useState<string[]>([]);
+  const [filledWords, setFilledWords] = useState<string[]>([]);
+  const [availableOptions, setAvailableOptions] = useState<string[]>([]);
+  const [timeLeft, setTimeLeft] = useState<number>(60);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const blanks = question.question.split("_____________");
-    setSentenceParts(blanks);
-    setFilledWords(new Array(blanks.length - 1).fill(""));
+    const parts = question.question.split("_____________");
+    setSentenceParts(parts);
+    setFilledWords(new Array(parts.length - 1).fill(""));
     setAvailableOptions(question.options);
-    setTimeLeft(30); // Reset timer for each question
+    setTimeLeft(60);
   }, [question]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimeLeft((prev) => {
+        if (prev === 1) {
+          handleSubmit(); // Auto-submit
+          clearInterval(timer);
+        }
+        return prev - 1;
+      });
     }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
-  const handleOptionClick = (word) => {
+    return () => clearInterval(timer);
+  }, [filledWords]);
+
+  const handleOptionClick = (word: string) => {
     const index = filledWords.findIndex((w) => w === "");
     if (index === -1) return;
     const updated = [...filledWords];
@@ -33,7 +51,7 @@ const SentenceCard = ({ question }) => {
     setAvailableOptions((prev) => prev.filter((w) => w !== word));
   };
 
-  const handleBlankClick = (index) => {
+  const handleBlankClick = (index: number) => {
     if (filledWords[index]) {
       setAvailableOptions((prev) => [...prev, filledWords[index]]);
       const updated = [...filledWords];
@@ -42,17 +60,25 @@ const SentenceCard = ({ question }) => {
     }
   };
 
+  const handleSubmit = () => {
+    // ✅ Pass the selected words as array, not joined string
+    onAnswer(filledWords);
+  };
+
   return (
     <div className="bg-white rounded-2xl p-6 w-full max-w-3xl mx-auto my-6">
-      {/* Top bar */}
       <div className="flex justify-between mb-4">
-        <div className="text-red-500 font-semibold text-lg">Time: {timeLeft}s</div>
-        <button 
-        onClick = {() =>navigate('/main')}
-        className="text-gray-500 hover:text-red-500">Quit</button>
+        <div className="text-red-500 font-semibold text-lg">
+          Time: {timeLeft}s
+        </div>
+        <button
+          onClick={() => navigate("/")}
+          className="shadow-2xl bg-red-600 font-bold text-white px-6 py-2 rounded-xl"
+        >
+          Quit
+        </button>
       </div>
 
-      {/* Sentence with blanks */}
       <div className="text-xl font-medium mb-6 flex flex-wrap gap-2">
         {sentenceParts.map((part, i) => (
           <span key={i}>
@@ -73,8 +99,7 @@ const SentenceCard = ({ question }) => {
         ))}
       </div>
 
-      {/* Option Buttons */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         {availableOptions.map((word, i) => (
           <button
             key={i}
@@ -86,7 +111,19 @@ const SentenceCard = ({ question }) => {
         ))}
       </div>
 
-       
+      <div className="flex justify-end">
+        <button
+          onClick={handleSubmit}
+          disabled={filledWords.includes("")}
+          className={`px-6 py-2 rounded-xl font-bold text-white ${
+            filledWords.includes("")
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600"
+          }`}
+        >
+          Save & Next
+        </button>
+      </div>
     </div>
   );
 };

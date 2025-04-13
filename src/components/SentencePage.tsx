@@ -1,46 +1,70 @@
-import { useState , useEffect} from "react";
-import SentenceCard from "./SentenceCard"; // your component
-import questionsData from "../questionsData.json"; // your JSON
+import { useState } from "react";
+import SentenceCard from "./SentenceCard";
+import questionsData from "../questionsData.json";
+import { useNavigate } from "react-router-dom";
+import { useQuiz } from "../context/score"; // Make sure this exists and is imported
 
 const MainPage = () => {
+  const { score, setScore, responses, setResponses } = useQuiz();
   const questions = questionsData.data.questions;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30); // Countdown time
 
-    useEffect(() => {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-      return () => clearInterval(timer);
-    }, []);
+  const navigate = useNavigate();
 
-
-
-  const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+  const handleNext = (selectedAnswer: string[]) => {
+    const currentQuestion = questions[currentIndex];
+  
+    const isCorrect = selectedAnswer.every(
+      (word: string, i: number) => word === currentQuestion.correctAnswer[i]
+    );
+  
+    if (isCorrect) {
+      setScore((prev) => prev + 1);
+    }
+  
+    // Build question with user's answer
+    let userFilled = "";
+    let correctFilled = "";
+    const sentenceParts = currentQuestion.question.split("_____________");
+  
+    sentenceParts.forEach((part, i) => {
+      userFilled += part;
+      correctFilled += part;
+      if (i < selectedAnswer.length) {
+        userFilled += selectedAnswer[i];
+        correctFilled += currentQuestion.correctAnswer[i];
+      }
+    });
+  
+    const response = {
+      originalQuestion: currentQuestion.question,
+      userFilled,
+      correctFilled,
+      selected: selectedAnswer,
+      correct: currentQuestion.correctAnswer,
+      isCorrect,
+    };
+  
+    setResponses((prev) => [...prev, response]);
+  
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex((prev) => prev + 1);
     } else {
-      alert("All questions completed!");
+      alert("All questions completed successfully!");
+      navigate("/result");
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f8fc] p-6 shadow-lg-rounded-3xl">
-    
-    <div className="bg-white p-6 rounded-xl shadow-lg">
-      <SentenceCard question={questions[currentIndex]} />
-  
-      <div className="flex  justify-end  mt-auto">
-      <button
-        onClick={handleNext}
-        className="mt-4  bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-2 rounded-xl "
-      >
-        Save & Next
-      </button>
+      <div className="bg-white p-6 rounded-xl shadow-lg">
+        <SentenceCard
+          question={questions[currentIndex]}
+          onAnswer={handleNext}
+        />
       </div>
     </div>
-  </div>
-  
   );
 };
 
